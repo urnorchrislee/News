@@ -6,6 +6,7 @@ const bodyParser=require('body-parser');
 const multer=require('multer');
 const consolidate=require('consolidate');
 const mysql=require('mysql');
+const common = require('./libs/common');
 
 //连接池
 const db=mysql.createPool({host: 'localhost', user: 'root', password: '111111', database: 'blog'});
@@ -43,7 +44,7 @@ server.get('/', (req, res, next)=>{
     })
 });
 server.get('/', (req, res, next)=>{
-    db.query('select title,summary from `blog`.`article_table`', function(err, data){
+    db.query('select ID,title,summary from `blog`.`article_table`', function(err, data){
         if(err){
             res.status(500).send('连接数据库失败').end();
         } else {
@@ -54,6 +55,29 @@ server.get('/', (req, res, next)=>{
 })
 server.get('/', (req, res, next)=>{
     res.render('index.ejs', {banners: res.banners, articles: res.articles});
+})
+
+server.get('/article', (req, res)=>{
+    if(req.query.id){
+        db.query(`SELECT * FROM article_table WHERE ID=${req.query.id}`, (err, data)=>{
+            if(err){
+                res.status(500).send('连接数据库失败').end();
+            }else{
+                if(data.length == 0){
+                    res.status(404).send('您访问的页面不存在').end();
+                } else{
+                    // console.log(data[0]);
+                    var articleData = data[0];
+                    articleData.sDate = common.time2date(articleData.post_time);
+                    articleData.content = articleData.content.replace(/^/gm, '<p>').replace(/$/gm, '</p>');
+
+                    res.render('conText.ejs', {article_table: articleData})
+                }
+            }
+        })
+    } else{
+        res.status(404).send('您访问的页面不存在').end();
+    }
 })
 
 //4.static数据

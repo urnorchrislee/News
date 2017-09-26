@@ -64,7 +64,7 @@
     	<ul>
             <% for(var i=0; i<articles.length; i++){ %>
             <li>
-            	<a href="conText.html">
+            	<a href="/article?id=<%= articles[i].ID%>">
                     <h2><%= articles[i].title%></h2>
                     <p><%= articles[i].summary%></p>
                 </a>
