@@ -109,5 +109,19 @@ server.get('/article', (req, res)=>{
     }
 })
 
+server.get('/setting', (req, res)=>{
+    res.render('mydoc.ejs', {})
+})
+
+server.get('/publish', (req, res)=>{
+    db.query('insert into `blog`.`article_table` ( `author`, `author_src`, `title`, `post_time`, `content`, `summary`, `n_like`) values ( "王瑛琪", "images/nav4.png", "Happy New Year", "1506428949", "Content", "1506428949", "0")', (err, data)=>{
+        if(err){
+            res.status(500).send('连接数据库失败').end();
+        } else{
+            res.send('发布成功').end();
+        }
+    })
+})
+
 //4.static数据
 server.use(static('./www'));
