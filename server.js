@@ -59,22 +59,51 @@ server.get('/', (req, res, next)=>{
 
 server.get('/article', (req, res)=>{
     if(req.query.id){
-        db.query(`SELECT * FROM article_table WHERE ID=${req.query.id}`, (err, data)=>{
-            if(err){
-                res.status(500).send('连接数据库失败').end();
-            }else{
-                if(data.length == 0){
-                    res.status(404).send('您访问的页面不存在').end();
-                } else{
-                    // console.log(data[0]);
-                    var articleData = data[0];
-                    articleData.sDate = common.time2date(articleData.post_time);
-                    articleData.content = articleData.content.replace(/^/gm, '<p>').replace(/$/gm, '</p>');
 
-                    res.render('conText.ejs', {article_table: articleData})
+        if(req.query.act == 'like'){
+            // 点赞
+            db.query(`UPDATE article_table SET n_like=n_like+1 WHERE ID=${req.query.id}`, (err, data)=>{
+                if(err){
+                    res.status(500).send('连接数据库失败').end();
+                } else{
+                    // 显示文章
+                    db.query(`SELECT * FROM article_table WHERE ID=${req.query.id}`, (err, data)=>{
+                        if(err){
+                            res.status(500).send('连接数据库失败').end();
+                        }else{
+                            if(data.length == 0){
+                                res.status(404).send('您访问的页面不存在').end();
+                            } else{
+                                // console.log(data[0]);
+                                var articleData = data[0];
+                                articleData.sDate = common.time2date(articleData.post_time);
+                                articleData.content = articleData.content.replace(/^/gm, '<p>').replace(/$/gm, '</p>');
+
+                                res.render('conText.ejs', {article_table: articleData})
+                            }
+                        }
+                    })
                 }
-            }
-        })
+            })
+        } else{
+            // 显示文章
+            db.query(`SELECT * FROM article_table WHERE ID=${req.query.id}`, (err, data)=>{
+                if(err){
+                    res.status(500).send('连接数据库失败').end();
+                }else{
+                    if(data.length == 0){
+                        res.status(404).send('您访问的页面不存在').end();
+                    } else{
+                        // console.log(data[0]);
+                        var articleData = data[0];
+                        articleData.sDate = common.time2date(articleData.post_time);
+                        articleData.content = articleData.content.replace(/^/gm, '<p>').replace(/$/gm, '</p>');
+
+                        res.render('conText.ejs', {article_table: articleData})
+                    }
+                }
+            })
+        }
     } else{
         res.status(404).send('您访问的页面不存在').end();
     }
