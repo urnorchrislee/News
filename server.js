@@ -33,13 +33,15 @@ server.engine('html', consolidate.ejs);
 
 //接收用户请求
 server.get('/', (req, res)=>{
-
-  
+    db.query('select * from `blog`.`banner_table`', function(err, data){
+        if(err){
+            res.status(500).send('连接数据库失败').end();
+        } else{
+            res.render('index.ejs', {banners: data})
+            console.log(data);
+        }
+    })
 });
-
-
-
-
 
 //4.static数据
 server.use(static('./www'));
